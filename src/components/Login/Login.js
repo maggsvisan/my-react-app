@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import firebase from 'firebase';
 import './Login.css';
 import { Button } from 'react-materialize';
+import UserStore from '../../store/UserStore';
 
 class Login extends Component {
 
@@ -18,33 +19,18 @@ class Login extends Component {
     }
 
     handleChange(e) {
-        console.log("credentiaaalssss");
         this.setState({ [e.target.name]: e.target.value });
     }
 
     login(e) {
-        console.log("loginssdfsf");
         e.preventDefault();
-        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then((u) => {
-        }).catch((error) => {
-
-            if (error.code === "auth/user-not-found")
-                alert("User not found");
-
-            if (error.code === "auth/wrong-password")
-                alert("Wrong password");
-            
-            console.log(error);
-        });
+        UserStore.signIn(this.state.email, this.state.password);
     }
 
 
     signup(e) {
         e.preventDefault();
-        firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
-            .catch((error) => {
-                console.log(error);
-            })
+        UserStore.signUp(this.state.email, this.state.password);
     }
 
 

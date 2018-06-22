@@ -1,36 +1,27 @@
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import DevTools from 'mobx-react-devtools';
 import './App.css';
 // set database config   "npm i firebase"
-import firebase from 'firebase';
-import { DB_CONFIG } from "./config/config";
-import 'firebase/database';
 import Toolbar from './components/Toolbar/Toolbar';
 import Login from './components/Login/Login';
-
+import firebaseApp from './firebase/firebaseApp';
+import UserStore from './store/UserStore';
 
 class App extends Component {
-  state = {
-    notes: [],
-    trigger: '',
-    user: null,
-  };
-
   constructor() {
     super();
 
-    this.app = firebase.initializeApp(DB_CONFIG);
+    this.app = firebaseApp;
     this.db = this.app.database().ref().child('BirthdaySection');
     this.db2 = this.app.database().ref().child('LoopPromo');
     this.db3 = this.app.database().ref().child('PowerSettings');
     this.db4 = this.app.database().ref().child('Scheduler');
-
   }
   
   
   componentDidMount() {
-    this.authListener();
     this.showSchedules();
-     
   }
 
   showSchedules = (screenName) => {
@@ -38,31 +29,14 @@ class App extends Component {
     console.log("selected Screen", screenName);
     let selectedDay='0';
 
-    var ref= this.app.database().ref('Scheduler/Screen1/'+selectedDay +'/');
-    ref.on('value', gotData, errData);
-
-    
-    let randomScreen='Screen1';
-
-    function gotData (data) {
-      console.log(data.val());
-      let values= data.val();
-      console.log("all dictionary:", values.schedule1.VideoName);
-    }
-    
-    function errData (err) {
-      console.log(err);
-    }
-  }
-
-  authListener = () => {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.setState({ user });
-      }
-      else {
-        this.setState({ user: null })
-      }
+    this.app.database()
+      .ref(`Scheduler/Screen1/${selectedDay}/`)
+      .on('value', (data) => {
+        console.log(data.val());
+        let values= data.val();
+        console.log("all dictionary:", values.schedule1.VideoName);
+      }, (err) => {
+        console.log(err);
     });
   }
 
@@ -175,14 +149,14 @@ class App extends Component {
           <h5>Change your screen's content from a web</h5>
         </div>
 
-        {this.state.user ? (<Toolbar 
+        {UserStore.user ? (<Toolbar 
           updateAnnouncement={this.updateAnnouncement}
           updateLoopPromo={this.updateLoopPromo}
           updatePowerSettings= {this.updatePowerSettings}
           updateScheduler= {this.updateScheduler}
           showSchedules= {this.showSchedules}
         />) : (<Login />)}
-
+          <DevTools />
       </div>
 
 
@@ -190,4 +164,5 @@ class App extends Component {
   }
 }
 
-export default App;
+export default observer(App);
+ 

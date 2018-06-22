@@ -10,6 +10,7 @@ import QuickViewSchedule from '../QuickViewSchedule/QuickViewSchedule';
 import firebase from 'firebase';
 
 import { Icon, Navbar, Button } from 'react-materialize';
+import UserStore from "../../store/UserStore";
 
 class Toolbar extends Component {
   
@@ -20,8 +21,7 @@ class Toolbar extends Component {
   }
 
   logout() {
-    console.log("Hi Logout!")
-    firebase.auth().signOut();
+    UserStore.signOut();
   }
 
   render() {
@@ -67,7 +67,7 @@ class Toolbar extends Component {
 
 
             <li>
-              <Button onClick={this.logout}> Logout </Button>
+              <Button onClick={() => this.logout()}> Logout </Button>
             </li>
 
           </Navbar>
@@ -76,10 +76,9 @@ class Toolbar extends Component {
 
           <Switch>
             <Route exact path="/Scheduler" render={() => <Scheduler
-              verifyDayOfWeek={this.props.verifyDayOfWeek}
-              submitSchedules={this.props.submitSchedules}
-              updateScheduler={this.props.updateScheduler}
-              schedulerSection={this.props.schedulerSection} />}
+                verifyDayOfWeek={this.props.verifyDayOfWeek}
+                updateScheduler={this.props.updateScheduler}
+              />}
             />
             
             <Route exact path="/QuickViewSchedule" render={() => <QuickViewSchedule

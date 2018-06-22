@@ -3,6 +3,8 @@ import './ScheduleContent.css';
 import { Row } from 'react-materialize';
 import Dropdown from '../Dropdown/Dropdown';
 import DropdownScreen from '../DropdownScreen/DropdownScreen'
+import { observer } from 'mobx-react';
+import ScheduleStore from '../../store/ScheduleStore';
 
 
 //concat mp4 format
@@ -81,62 +83,39 @@ class SchedulerContent extends Component {
     }
 
     addSchedule = () => {
-        const schedules = this.state.schedules;
-        if (schedules.length > 3) return;
-
-        this.setState(prevState => ({
-            schedules: [...schedules, {
-                video: 'video 1',
-                start: 0,
-                end: 0,
-            }]
-        }));
+        ScheduleStore.addScheduleForDay(this.props.dayIndex);
     }
 
     handleScheduleChange = (index, name, value) => {
-        console.log(index);
-        const schedules = this.state.schedules;
+        const schedules = ScheduleStore.days[this.props.dayIndex].schedules.slice();
         const scheduleToModify = schedules[index];
 
         scheduleToModify[name] = value;
-        schedules[index] = scheduleToModify;
-        /*
-        this.setState({ schedules }, () => {
-            console.log(this.state.schedules[index]);
-        });
-        */
+        ScheduleStore.updateSchedule(this.props.dayIndex, index, scheduleToModify);
     }
-
 
     handleScreenChange = (name, value) => {
         this.setState({ screenName: value });
     }
 
-
-
-    removeSchedule = (index) => {
-        if (this.state.schedules.length === 1) return;
-
-        let schedules = [...this.state.schedules];
-        schedules.splice(index, 1);
-
-        this.setState({
-            schedules: [...schedules],
-        });
-
+    removeSchedule = () => {
+        ScheduleStore.removeScheduleForDay(this.props.dayIndex);
     }
 
     handleSubmit = () => {
-        this.props.handleSubmit(this.state.schedules, this.props.dayIndex);
+        // this.props.handleSubmit(this.state.schedules, this.props.dayIndex);
     }
 
 
     sendToDb = () => {
+        ScheduleStore.sendToDb();
+        return;
+
         console.log("Clicked!")
         //console.log("length:", this.state.schedules.length);
         this.setState(prevState => {
         
-        for (let i=0; i < this.state.schedules.length; i++ ){
+            for (let i=0; i < this.state.schedules.length; i++ ){
                 if (this.state.schedules[0].start === "" ||
                     this.state.schedules[0].end === "" ||
                     this.state.screenName === "" ||
@@ -184,16 +163,6 @@ class SchedulerContent extends Component {
                             
                             screen2Push="all";
                             
-                            response.push({
-                                scheduleIndex: 'schedule'+ (i+1),
-                                dayIndex:this.props.dayIndex,
-                                screen: screen2Push,
-                                video: this.state.schedules[i].video +'.mp4',
-                                start:this.state.schedules[i].start,
-                                end: this.state.schedules[i].end,
-                                scheduleSelected: this.state.scheduleSelected,
-                            });
-                                
                             //console.log("send response", response);
                             this.props.updateScheduler(response);
 
@@ -221,7 +190,7 @@ class SchedulerContent extends Component {
                     }
 
                 }
-             }
+            }
         });
         window.location.reload();
     }
@@ -249,7 +218,7 @@ class SchedulerContent extends Component {
                     </div>
 
                     {
-                        this.state.schedules.map((value, index) => (
+                        ScheduleStore.days[this.props.dayIndex].schedules.map((value, index) => (
                             <Fragment key={index}>
                                 <div className="row">
                                     <div className="col s12">
@@ -266,41 +235,52 @@ class SchedulerContent extends Component {
                                                 handleChange={this.handleScheduleChange}
                                                 name="video"
                                                 index={index}
-                                                items={videoName} />
+                                                items={videoName} 
+                                            />
                                         </Row >
                                     </div>
 
                                     <div className="col s4">
                                         <Row >
                                             <p className="subtitlesHead" > Start time </p>
-                                            <Dropdown handleChange={this.handleScheduleChange} name="start" index={index} items={timeNumber} />
+                                            <Dropdown 
+                                                handleChange={this.handleScheduleChange} 
+                                                name="start" 
+                                                index={index} 
+                                                items={timeNumber} 
+                                            />
                                         </Row >
                                     </div>
 
                                     <div className="col s4">
                                         <Row >
                                             <p className="subtitlesHead"> End time </p>
-                                            <Dropdown handleChange={this.handleScheduleChange} name="end" index={index} items={timeNumber} />
+                                            <Dropdown 
+                                                handleChange={this.handleScheduleChange} 
+                                                name="end" 
+                                                index={index} 
+                                                items={timeNumber} 
+                                            />
                                         </Row >
                                     </div>
-                                </div>
-
-                                <div className="row">
-
-                                    <div className="col s6">
-                                        <button onClick={() => this.addSchedule()} className="buttonSubmit"> Add </button>
-                                    </div>
-
-                                    <div className="col s6">
-                                        <button onClick={() => this.removeSchedule(index)} className="buttonSubmit">Remove </button>
-                                    </div>
-                                    
                                 </div>
                                 
                             </Fragment>
                         ))
                     }
                    
+                </div>
+
+                <div className="row">
+
+                    <div className="col s6">
+                        <button onClick={() => this.addSchedule()} className="buttonSubmit"> Add </button>
+                    </div>
+
+                    <div className="col s6">
+                        <button onClick={() => this.removeSchedule()} className="buttonSubmit">Remove </button>
+                    </div>
+
                 </div>
 
                 <div className="row">
@@ -317,4 +297,5 @@ class SchedulerContent extends Component {
         )
     }
 }
-export default SchedulerContent;
+
+export default observer(SchedulerContent);
