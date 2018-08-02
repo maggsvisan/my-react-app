@@ -2,7 +2,8 @@ import React, { Component, Fragment } from 'react';
 import './ScheduleContent.css';
 import { Row, Button } from 'react-materialize';
 import Dropdown from '../Dropdown/Dropdown';
-import DropdownScreen from '../DropdownScreen/DropdownScreen'
+import DropdownScreen from '../DropdownScreen/DropdownScreen';
+import TimerMixin from 'react-timer-mixin';
 
 //import firebase from 'firebase';
 import 'firebase/database';
@@ -82,6 +83,11 @@ class SchedulerContent extends Component {
         screenName2 = this.state.screenName;
         videoName2 = "";
 
+        TimerMixin.setTimeout(
+            () => { console.log('I do not leak!'); },
+            5000
+        );
+        
         //get common dropdown
         inventoryRef.once("value").then(function(snapshot) {
             numberOfChildren=snapshot.numChildren();
