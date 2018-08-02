@@ -73,7 +73,7 @@ class SchedulerContent extends Component {
         screenList: [],
         videoList: [],
         commonDropDown: [],
-        scheduleSelected:'Schedule 1',
+        scheduleSelected:'1',
         showCommonDrop: false,
         schedules: [
             {
@@ -91,12 +91,10 @@ class SchedulerContent extends Component {
         screenName2 = this.state.screenName;
         videoName2 = "";
 
-        /*
         TimerMixin.setTimeout(
             () => { console.log('I do not leak!'); },
             5000
         );
-        */
 
         //get common dropdown
         inventoryRef.once("value").then(function(snapshot) {
@@ -123,7 +121,7 @@ class SchedulerContent extends Component {
                 count[i] = (count[i]||0) + 1;
                 if(count[i] >= numberOfChildren){
                     commonVideos.push({name: i, key:k});
-                    //console.log(`the count is ${k}`,commonVideos);
+                    console.log(`the count is ${k}`,commonVideos);
                 }
                
             });
@@ -269,13 +267,7 @@ class SchedulerContent extends Component {
         this.props.handleSubmit(this.state.schedules, this.props.dayIndex);
     }
     
-    sendToDb = () => {   
-        console.log(this.state.scheduleSelected);
-        let sendSelectedSchedule;
-        
-        sendSelectedSchedule= this.state.scheduleSelected;
-        sendSelectedSchedule= sendSelectedSchedule.slice(-1); //modify schedule number input 
-     
+    sendToDb = () => {        
         this.setState(prevState => {
             let daySelected= this.props.dayIndex;
 
@@ -319,11 +311,8 @@ class SchedulerContent extends Component {
                         screen2Push= this.state.screenName;
                         const self = this;
                         videoNameDB="";
-                       
                         if (screen2Push === 'all' ){
-                            console.log("entra aqui")
-                        }
-                            /*
+
                             if(self.state.schedules[i].video === "video1"){
                                 if(commonVideos.length > 0){
                                     videoNameDB= commonVideos[0].name; 
@@ -374,11 +363,8 @@ class SchedulerContent extends Component {
  
                         }   
 
-                        */
-
                         else{
-                            console.log(`ESTE ES EL HORARIO A MODIFICAR schedule${sendSelectedSchedule}`);
-
+                            
                             if(self.state.schedules[i].video === "video1"){
                                 
                                 firebaseApp.database().ref(`Inventory/${self.state.screenName}/`) //first value for dropdowns, screen1
@@ -397,22 +383,16 @@ class SchedulerContent extends Component {
                             }
                             
                             videoNameDB= videoNameDB.replace(/\s/g,'');
-                            console.log("self.state.schedules[i].start",self.state.schedules[i].start);
-                            console.log("end",self.state.schedules[i].end);
-                            console.log("video", videoNameDB);
                                
-                            schedulerRef.child(`${self.state.screenName}/${daySelected}/schedule${sendSelectedSchedule}`).update({
+                            schedulerRef.child(`${self.state.screenName}/${daySelected}/schedule${i+1}`).update({
                                 "VideoName": videoNameDB,
                                 "startTime": self.state.schedules[i].start,
                                 "endTime":  self.state.schedules[i].end,
-                            }).then(()=>{
-                                window.location.reload();
                             });            
 
                             alert(`Send to ${self.state.screenName}`);
-                          
+                            window.location.reload();
                         }
-                        
                     }
                 }
              }
@@ -466,7 +446,14 @@ class SchedulerContent extends Component {
                     {
                         this.state.schedules.map((value, index) => (
                             <Fragment key={index}>
+                                <div className="row">
+                                    <div className="col s12">
+                                        <h5 className="titleHead">Schedule {index + 1}</h5>
+                                    </div>
+                                </div>
+
                                 <div className="row" >
+
                                     { this.state.showCommonDrop ? (
                                         <div className="row">
                                         <div className="col s12">
@@ -479,15 +466,17 @@ class SchedulerContent extends Component {
                                                 />            
                                         </div>
                                         </div>): ( 
+                                            
                                             <div className="col s12">
                                           
-                                                <p className="subtitlesHeadSchedule"> Select a video  </p>
+                                                <p className="subtitlesHeadSchedule"> Select a video in {this.state.screenName} to schedule </p>
                                                 <Dropdown
                                                     handleChange={this.handleScheduleChange}
                                                     name="video"
                                                     index={index}
                                                     items={this.state.videoList} 
-                                                    />    
+                                                    />
+                                           
                                         </div>
 
                                         )
@@ -507,7 +496,20 @@ class SchedulerContent extends Component {
                                             <Dropdown handleChange={this.handleScheduleChange} name="end" index={index} items={timeNumber} />
                                         </Row >
                                     </div>
-                                </div>                                
+                                </div>
+
+                                <div className="row">
+
+                                    <div className="col s6">
+                                        <Button onClick={() => this.addSchedule()} > Add </Button>
+                                    </div>
+
+                                    <div className="col s6">
+                                        <Button onClick={() => this.removeSchedule(index)}>Remove </Button>
+                                    </div>
+                                    
+                                </div>
+                                
                             </Fragment>
                         ))
                     }

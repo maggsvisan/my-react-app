@@ -136,6 +136,8 @@ class PromoLoop extends Component {
                 "VideoName": '0',
                 "startTime": '0',
                 "endTime": '0', 
+            }).then(()=>{
+                window.location.reload();
             })
         }, (err) => {
             console.log(err);
@@ -201,7 +203,7 @@ class PromoLoop extends Component {
                                 <Table className="quickTable">
                                     <thead>
                                         <tr>
-                                            <th> Select schedule</th>
+                                            <th> </th>
                                             <th> Schedule Name</th>
                                             <th>Video Name</th>
                                             <th>Start Time</th>
@@ -220,7 +222,7 @@ class PromoLoop extends Component {
                                                             type="submit"
                                                             value="Submit"
                                                         >
-                                                            Select
+                                                            Remove
                                                         </Button>
                                                     </td>
                                                     <td> {schedule.scheduleKey} </td>
