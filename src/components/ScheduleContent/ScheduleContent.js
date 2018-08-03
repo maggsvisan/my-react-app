@@ -321,9 +321,7 @@ class SchedulerContent extends Component {
                         videoNameDB="";
                        
                         if (screen2Push === 'all' ){
-                            console.log("entra aqui")
-                        }
-                            /*
+                            
                             if(self.state.schedules[i].video === "video1"){
                                 if(commonVideos.length > 0){
                                     videoNameDB= commonVideos[0].name; 
@@ -372,9 +370,7 @@ class SchedulerContent extends Component {
                                 })
                             }
  
-                        }   
-
-                        */
+                        }     
 
                         else{
                             console.log(`ESTE ES EL HORARIO A MODIFICAR schedule${sendSelectedSchedule}`);
